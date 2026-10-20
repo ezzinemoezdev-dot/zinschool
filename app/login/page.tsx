@@ -1,11 +1,9 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -13,7 +11,9 @@ export default function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true); setError('')
+    setLoading(true)
+    setError('')
+    
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     
@@ -22,9 +22,12 @@ export default function LoginPage() {
       setLoading(false)
       return 
     }
+
+    // نستنوا شوية (نص ثانية) باش نضمنوا أن Supabase حفظت الكوكي في المتصفح
+    await new Promise(resolve => setTimeout(resolve, 500))
     
-    router.push('/dashboard')
-    router.refresh()
+    // نعملوا ريفريش قوي ونروحوا للوحة (هذا يحل مشكلة الطرد)
+    window.location.href = '/dashboard'
   }
 
   return (
