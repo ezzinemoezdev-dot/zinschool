@@ -19,6 +19,7 @@ export default function FileUpload({
     const lastDot = name.lastIndexOf('.')
     const ext = lastDot !== -1 ? name.slice(lastDot) : ''
     const base = lastDot !== -1 ? name.slice(0, lastDot) : name
+    // نبدلوا أي حاجة ماهيش حرف إنجليزي أو رقم بـ underscore
     const cleanBase = base.replace(/[^a-zA-Z0-9_-]/g, '_')
     return cleanBase + ext
   }
@@ -27,7 +28,7 @@ export default function FileUpload({
     const file = e.target.files?.[0]
     if (!file) return
     
-    setSelectedName(file.name) // نخزروا الاسم باش نوروه للمستخدم
+    setSelectedName(file.name)
     setUploading(true)
     setErr('')
     
@@ -46,24 +47,12 @@ export default function FileUpload({
     }
     
     onUploaded(fullPath, file.name)
-    
-    // نفرغوا الـ input باش ينجم يختار ملف آخر إذا حب
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   return (
     <div className="flex flex-col gap-2">
-      {/* الـ input الأصلي مخبي */}
-      <input 
-        type="file" 
-        accept={accept} 
-        onChange={handleChange} 
-        disabled={uploading} 
-        className="hidden" 
-        ref={fileInputRef}
-      />
-      
-      {/* الزر المخصص اللي باش يبان */}
+      <input type="file" accept={accept} onChange={handleChange} disabled={uploading} className="hidden" ref={fileInputRef} />
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -73,15 +62,12 @@ export default function FileUpload({
         >
           {uploading ? '⏳ جاري الرفع...' : '📁 اختيار ملف'}
         </button>
-        
-        {/* نرو اسم الملف كي يختارو */}
         {selectedName && !err && (
           <span className="text-xs text-gray-500 truncate max-w-[150px]" title={selectedName}>
             {selectedName}
           </span>
         )}
       </div>
-
       {err && <p className="text-red-600 text-xs">{err}</p>}
     </div>
   )
