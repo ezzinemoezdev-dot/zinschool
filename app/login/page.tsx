@@ -23,10 +23,7 @@ export default function LoginPage() {
       return 
     }
 
-    // نستنوا شوية (نص ثانية) باش نضمنوا أن Supabase حفظت الكوكي في المتصفح
     await new Promise(resolve => setTimeout(resolve, 500))
-    
-    // نعملوا ريفريش قوي ونروحوا للوحة (هذا يحل مشكلة الطرد)
     window.location.href = '/dashboard'
   }
 
@@ -69,9 +66,16 @@ export default function LoginPage() {
           {loading ? '...' : 'دخول (Connexion)'}
         </button>
 
-        <p className="text-sm text-center text-gray-600">
-          ما عندكش حساب؟ <Link href="/register" className="text-indigo-600 font-semibold hover:underline">سجّل</Link>
-        </p>
+        {/* رابط نسيت كلمة السر */}
+        <div className="text-sm text-center text-gray-600 space-y-2">
+          <p>
+            <Link href="/forgot-password" className="text-indigo-600 font-semibold hover:underline">نسيت كلمة السر؟</Link>
+          </p>
+          <p>
+            ما عندكش حساب؟ <Link href="/register" className="text-indigo-600 font-semibold hover:underline">سجّل</Link>
+          </p>
+        </div>
+
       </form>
 
       {/* الاسم في الأسفل */}
