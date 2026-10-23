@@ -5,8 +5,10 @@ import { createClient } from '@/lib/supabase/client'
 export default function Forum({ classId, userId }: { classId: string, userId: string }) {
   const [posts, setPosts] = useState<any[]>([])
   const [newPost, setNewPost] = useState('')
+  const [userRole, setUserRole] = useState<string | null>(null)
   const supabase = createClient()
 
+  // دالة جلب الرسائل
   async function loadPosts() {
     const { data } = await supabase
       .from('forum_posts')
@@ -16,17 +18,31 @@ export default function Forum({ classId, userId }: { classId: string, userId: st
     setPosts(data ?? [])
   }
 
+  // جلب دور المستخدم (أستاذ ولا تلميذ)
+  async function fetchUserRole() {
+    const { data } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single()
+    if (data) setUserRole(data.role)
+  }
+
   useEffect(() => {
+    fetchUserRole()
     loadPosts()
-    // الاستماع للرسائل الجديدة لايف
+
+    // الاستماع للرسائل الجديدة لايف (Realtime)
     const channel = supabase.channel('forum-' + classId)
       .on('postgres_changes', 
         { event: 'INSERT', schema: 'public', table: 'forum_posts', filter: `class_id=eq.${classId}` }, 
         () => loadPosts()
       ).subscribe()
+      
     return () => { supabase.removeChannel(channel) }
   }, [classId])
 
+  // إرسال رسالة جديدة
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!newPost.trim()) return
@@ -41,13 +57,33 @@ export default function Forum({ classId, userId }: { classId: string, userId: st
     else setNewPost('')
   }
 
+  // حذف رسالة (للأستاذ فقط)
+  async function handleDelete(postId: string) {
+    if (!confirm('هل أنت متأكد من حذف هذه الرسالة؟')) return
+    const { error } = await supabase.from('forum_posts').delete().eq('id', postId)
+    if (error) alert(error.message)
+    else loadPosts()
+  }
+
   return (
     <div className="bg-white rounded-xl shadow p-6 mt-8 border-t-4 border-teal-500">
       <h2 className="text-xl font-bold border-b pb-2 mb-4">💬 منتدى النقاش</h2>
       
       <div className="space-y-4 mb-6 max-h-96 overflow-y-auto pl-2">
         {posts.map(p => (
-          <div key={p.id} className={`p-3 rounded-lg ${p.profiles?.role === 'teacher' ? 'bg-indigo-50 border-r-4 border-indigo-500' : 'bg-gray-50'}`}>
+          <div key={p.id} className={`p-3 rounded-lg relative ${p.profiles?.role === 'teacher' ? 'bg-indigo-50 border-r-4 border-indigo-500' : 'bg-gray-50'}`}>
+            
+            {/* زر الحذف (كي يبان كان للأستاذ) */}
+            {userRole === 'teacher' && (
+              <button 
+                onClick={() => handleDelete(p.id)} 
+                className="absolute top-2 left-2 text-red-500 hover:text-red-700 text-xs"
+                title="حذف الرسالة"
+              >
+                🗑️
+              </button>
+            )}
+
             <div className="flex justify-between items-center mb-1">
               <span className="font-bold text-sm text-gray-800">
                 {p.profiles?.full_name} {p.profiles?.role === 'teacher' && '(أستاذ)'}
