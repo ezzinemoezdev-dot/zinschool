@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import FileUpload from '@/components/FileUpload'
 import OpenFileButton from '@/components/OpenFileButton'
@@ -129,6 +130,14 @@ export default function TeacherClassPage() {
       <div className="bg-white rounded-xl shadow p-6 border-r-4 border-indigo-600">
         <h1 className="text-2xl font-bold text-indigo-700">{cls.name}</h1>
         <p className="text-gray-500">{cls.subject} • {cls.level}</p>
+        
+        {/* زر عرض التلامذة */}
+        <Link 
+          href={`/teacher/classes/${id}/students`} 
+          className="inline-block mt-4 bg-white text-indigo-600 border border-indigo-200 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-indigo-50 transition"
+        >
+          👥 عرض التلامذة
+        </Link>
       </div>
 
       {/* الدروس */}
