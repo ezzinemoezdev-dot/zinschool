@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import OpenFileButton from '@/components/OpenFileButton'
 import { connection } from 'next/server'
+import Forum from '@/components/Forum'
 
 export default async function StudentClassPage({ params }: { params: Promise<{ id: string }> }) {
   await connection()
@@ -93,6 +94,9 @@ export default async function StudentClassPage({ params }: { params: Promise<{ i
           ))}
         </ul>
       </div>
+
+      {/* المنتدى */}
+      <Forum classId={id} userId={user!.id} />
     </div>
   )
 }
