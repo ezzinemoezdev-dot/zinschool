@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import FileUpload from '@/components/FileUpload'
 import OpenFileButton from '@/components/OpenFileButton'
+import Forum from '@/components/Forum'
 
 export default function TeacherClassPage() {
   const { id } = useParams()
@@ -16,21 +17,37 @@ export default function TeacherClassPage() {
   const [assignments, setAssignments] = useState<any[]>([])
   const [recordings, setRecordings] = useState<any[]>([])
   
+  // States للمواد
   const [title, setTitle] = useState('')
   const [filePath, setFilePath] = useState('')
   const [fileName, setFileName] = useState('')
+
+  // States للحصص
   const [sessionTitle, setSessionTitle] = useState('')
   const [sessionDate, setSessionDate] = useState('')
   const [sessionUrl, setSessionUrl] = useState('')
+
+  // States للأعمال (Devoirs)
   const [assignTitle, setAssignTitle] = useState('')
   const [assignPath, setAssignPath] = useState('')
   const [assignFileName, setAssignFileName] = useState('')
+
+  // States للتسجيلات
   const [recTitle, setRecTitle] = useState('')
   const [recUrl, setRecUrl] = useState('')
+
+  // States للـ User
+  const [userId, setUserId] = useState<string | null>(null)
+
   const [loading, setLoading] = useState(true)
 
   async function loadData() {
     setLoading(true)
+    
+    // جلب الـ User
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) setUserId(user.id)
+
     const { data: c } = await supabase.from('classes').select('*').eq('id', id).single()
     setCls(c)
     
@@ -50,14 +67,6 @@ export default function TeacherClassPage() {
   }
 
   useEffect(() => { loadData() }, [id])
-
-  // دالة الحذف
-  async function handleDelete(table: string, rowId: string) {
-    if (!confirm('هل أنت متأكد من حذف هذا العنصر؟')) return
-    const { error } = await supabase.from(table).delete().eq('id', rowId)
-    if (error) alert(error.message)
-    else loadData()
-  }
 
   async function addMaterial(e: React.FormEvent) {
     e.preventDefault()
@@ -98,6 +107,14 @@ export default function TeacherClassPage() {
     const { error } = await supabase.from('recordings').insert({ class_id: id, teacher_id: user!.id, title: recTitle, recording_url: recUrl })
     if (error) alert(error.message)
     else { setRecTitle(''); setRecUrl(''); loadData() }
+  }
+
+  // دالة الحذف
+  async function handleDelete(table: string, rowId: string) {
+    if (!confirm('هل أنت متأكد من حذف هذا العنصر؟')) return
+    const { error } = await supabase.from(table).delete().eq('id', rowId)
+    if (error) alert(error.message)
+    else loadData()
   }
 
   if (loading) return <div className="text-center mt-10">جاري التحميل...</div>
@@ -213,6 +230,10 @@ export default function TeacherClassPage() {
           ))}
         </ul>
       </div>
+
+      {/* المنتدى */}
+      {userId && <Forum classId={id as string} userId={userId} />}
+      
     </div>
   )
 }
