@@ -4,38 +4,40 @@ import { createClient } from '@supabase/supabase-js';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// نستعملوا service_role باش ننجموا نقرأوا الإيميل من جدول profiles
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // ⚠️ هذا المفتاح السري (ممنوع يطلع للمتصفح)
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    
-    // Supabase Webhook كيبعث البيانات في record
-    const notification = body.record; 
-    if (!notification || !notification.user_id) {
-      return NextResponse.json({ error: 'No user_id' }, { status: 400 });
+    console.log("Received body:", body); // باش نشوفوا شنوّة قاعد يجي
+
+    // نحاولوا نلقاو الـ user_id في أي بلاصة (باش نتفاداو الغلطة)
+    const notification = body.record || body;
+    const userId = notification.user_id || notification.record?.user_id;
+
+    if (!userId) {
+      return NextResponse.json({ error: 'No user_id', body }, { status: 400 });
     }
 
-    // نجيبوا إيميل المستخدم من جدول profiles
-    const { data: profile } = await supabaseAdmin
+    // نجيبوا الإيميل من profiles
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('email')
-      .eq('id', notification.user_id)
+      .eq('id', userId)
       .single();
 
-    if (!profile || !profile.email) {
-      return NextResponse.json({ error: 'User email not found' }, { status: 404 });
+    if (profileError || !profile || !profile.email) {
+      return NextResponse.json({ error: 'User email not found', profileError }, { status: 404 });
     }
 
     // نبعثوا الإيميل
     const { data, error } = await resend.emails.send({
       from: 'ZinSchool <onboarding@resend.dev>', 
       to: [profile.email],
-      subject: notification.title,
+      subject: notification.title || 'إشعار جديد',
       html: `<p>${notification.body || 'لديك إشعار جديد في منصة ZinSchool'}</p>
              <a href="https://zinschool.netlify.app${notification.link || ''}">اضغط هنا للمشاهدة</a>`,
     });
@@ -43,6 +45,6 @@ export async function POST(request: Request) {
     if (error) return NextResponse.json({ error }, { status: 500 });
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to send email', details: error }, { status: 500 });
   }
 }
