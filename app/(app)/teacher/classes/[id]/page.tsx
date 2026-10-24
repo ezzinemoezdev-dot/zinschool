@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import FileUpload from '@/components/FileUpload'
 import OpenFileButton from '@/components/OpenFileButton'
 import Forum from '@/components/Forum'
+import { translations, Lang } from '@/lib/i18n'
 
 export default function TeacherClassPage() {
   const { id } = useParams()
@@ -18,6 +19,9 @@ export default function TeacherClassPage() {
   const [assignments, setAssignments] = useState<any[]>([])
   const [recordings, setRecordings] = useState<any[]>([])
   
+  const [lang, setLang] = useState<Lang>('ar')
+  const t = translations[lang]
+
   // States للمواد
   const [title, setTitle] = useState('')
   const [filePath, setFilePath] = useState('')
@@ -37,15 +41,11 @@ export default function TeacherClassPage() {
   const [recTitle, setRecTitle] = useState('')
   const [recUrl, setRecUrl] = useState('')
 
-  // States للـ User
   const [userId, setUserId] = useState<string | null>(null)
-
   const [loading, setLoading] = useState(true)
 
   async function loadData() {
     setLoading(true)
-    
-    // جلب الـ User
     const { data: { user } } = await supabase.auth.getUser()
     if (user) setUserId(user.id)
 
@@ -67,7 +67,13 @@ export default function TeacherClassPage() {
     setLoading(false)
   }
 
-  useEffect(() => { loadData() }, [id])
+  useEffect(() => {
+    const savedLang = localStorage.getItem('lang') as Lang
+    if (savedLang && (savedLang === 'ar' || savedLang === 'fr')) setLang(savedLang)
+    loadData()
+  }, [id])
+
+  // ... (باقي الدوال كيف ما هي: addMaterial, addSession, addAssignment, addCorrection, addRecording, handleDelete)
 
   async function addMaterial(e: React.FormEvent) {
     e.preventDefault()
@@ -110,7 +116,6 @@ export default function TeacherClassPage() {
     else { setRecTitle(''); setRecUrl(''); loadData() }
   }
 
-  // دالة الحذف
   async function handleDelete(table: string, rowId: string) {
     if (!confirm('هل أنت متأكد من حذف هذا العنصر؟')) return
     const { error } = await supabase.from(table).delete().eq('id', rowId)
@@ -122,31 +127,27 @@ export default function TeacherClassPage() {
   if (!cls) return <div className="text-center mt-10 text-red-600">القسم غير موجود</div>
 
   return (
-    <div className="space-y-8" dir="rtl">
+    <div className="space-y-8" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <button onClick={() => router.push('/teacher/classes')} className="text-sm text-indigo-600 hover:underline">
-        ← رجوع للأقسام
+        {t.backToClasses}
       </button>
       
       <div className="bg-white rounded-xl shadow p-6 border-r-4 border-indigo-600">
         <h1 className="text-2xl font-bold text-indigo-700">{cls.name}</h1>
         <p className="text-gray-500">{cls.subject} • {cls.level}</p>
         
-        {/* زر عرض التلامذة */}
-        <Link 
-          href={`/teacher/classes/${id}/students`} 
-          className="inline-block mt-4 bg-white text-indigo-600 border border-indigo-200 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-indigo-50 transition"
-        >
-          👥 عرض التلامذة
+        <Link href={`/teacher/classes/${id}/students`} className="inline-block mt-4 bg-white text-indigo-600 border border-indigo-200 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-indigo-50 transition">
+          {t.studentsListBtn}
         </Link>
       </div>
 
       {/* الدروس */}
       <div className="bg-white rounded-xl shadow p-6 space-y-4">
-        <h2 className="text-xl font-bold border-b pb-2">📄 إضافة درس (PDF)</h2>
+        <h2 className="text-xl font-bold border-b pb-2">{t.addMaterialTitle}</h2>
         <form onSubmit={addMaterial} className="grid md:grid-cols-3 gap-3 items-center">
-          <input required placeholder="عنوان الدرس" value={title} onChange={e => setTitle(e.target.value)} className="border rounded p-2" />
+          <input required placeholder={t.materialTitlePlaceholder} value={title} onChange={e => setTitle(e.target.value)} className="border rounded p-2" />
           <FileUpload bucket="materials" path={id as string} onUploaded={(p, n) => { setFilePath(p); setFileName(n) }} />
-          <button disabled={!filePath} className="bg-indigo-600 text-white rounded p-2 disabled:opacity-50">+ رفع الدرس</button>
+          <button disabled={!filePath} className="bg-indigo-600 text-white rounded p-2 disabled:opacity-50">{t.uploadMaterialBtn}</button>
         </form>
         <ul className="divide-y mt-4">
           {materials.map(m => (
@@ -163,11 +164,11 @@ export default function TeacherClassPage() {
 
       {/* الأعمال والإصلاحات */}
       <div className="bg-white rounded-xl shadow p-6 space-y-4 border-t-4 border-orange-400">
-        <h2 className="text-xl font-bold border-b pb-2">📝 الأعمال المطلوبة والإصلاح</h2>
+        <h2 className="text-xl font-bold border-b pb-2">{t.addAssignmentTitle}</h2>
         <form onSubmit={addAssignment} className="grid md:grid-cols-3 gap-3 items-center bg-orange-50 p-3 rounded">
-          <input required placeholder="عنوان العمل" value={assignTitle} onChange={e => setAssignTitle(e.target.value)} className="border rounded p-2" />
+          <input required placeholder={t.assignmentTitlePlaceholder} value={assignTitle} onChange={e => setAssignTitle(e.target.value)} className="border rounded p-2" />
           <FileUpload bucket="assignments" path={id as string} onUploaded={(p, n) => { setAssignPath(p); setAssignFileName(n) }} />
-          <button disabled={!assignPath} className="bg-orange-500 text-white rounded p-2 disabled:opacity-50">+ إضافة عمل</button>
+          <button disabled={!assignPath} className="bg-orange-500 text-white rounded p-2 disabled:opacity-50">{t.addAssignmentBtn}</button>
         </form>
         <ul className="space-y-4 mt-4">
           {assignments.map(a => (
@@ -196,18 +197,18 @@ export default function TeacherClassPage() {
 
       {/* التسجيلات */}
       <div className="bg-white rounded-xl shadow p-6 space-y-4 border-t-4 border-purple-500">
-        <h2 className="text-xl font-bold border-b pb-2">🎬 إضافة تسجيل حصة</h2>
+        <h2 className="text-xl font-bold border-b pb-2">{t.addRecordingTitle}</h2>
         <form onSubmit={addRecording} className="grid md:grid-cols-3 gap-3 items-center bg-purple-50 p-3 rounded">
-          <input required placeholder="عنوان التسجيل" value={recTitle} onChange={e => setRecTitle(e.target.value)} className="border rounded p-2" />
-          <input required placeholder="رابط التسجيل (YouTube/Drive)" value={recUrl} onChange={e => setRecUrl(e.target.value)} className="border rounded p-2" dir="ltr" />
-          <button className="bg-purple-600 text-white rounded p-2 font-semibold">+ إضافة تسجيل</button>
+          <input required placeholder={t.recordingTitlePlaceholder} value={recTitle} onChange={e => setRecTitle(e.target.value)} className="border rounded p-2" />
+          <input required placeholder={t.recordingUrlPlaceholder} value={recUrl} onChange={e => setRecUrl(e.target.value)} className="border rounded p-2" dir="ltr" />
+          <button className="bg-purple-600 text-white rounded p-2 font-semibold">{t.addRecordingBtn}</button>
         </form>
         <ul className="divide-y mt-4">
           {recordings.map(r => (
             <li key={r.id} className="py-3 flex justify-between items-center">
               <div className="font-medium text-gray-800">{r.title}</div>
               <div className="flex gap-2">
-                <a href={r.recording_url} target="_blank" className="text-xs px-3 py-1 bg-purple-100 text-purple-700 font-semibold rounded">مشاهدة</a>
+                <a href={r.recording_url} target="_blank" className="text-xs px-3 py-1 bg-purple-100 text-purple-700 font-semibold rounded">{t.view}ة</a>
                 <button onClick={() => handleDelete('recordings', r.id)} className="text-red-500 hover:text-red-700 text-sm font-bold">🗑️</button>
               </div>
             </li>
@@ -217,12 +218,12 @@ export default function TeacherClassPage() {
 
       {/* الحصص المباشرة */}
       <div className="bg-white rounded-xl shadow p-6 space-y-4">
-        <h2 className="text-xl font-bold border-b pb-2">🎥 إضافة حصة مباشرة</h2>
+        <h2 className="text-xl font-bold border-b pb-2">{t.addSessionTitle}</h2>
         <form onSubmit={addSession} className="grid md:grid-cols-4 gap-3 items-center">
-          <input required placeholder="عنوان الحصة" value={sessionTitle} onChange={e => setSessionTitle(e.target.value)} className="border rounded p-2" />
+          <input required placeholder={t.sessionTitlePlaceholder} value={sessionTitle} onChange={e => setSessionTitle(e.target.value)} className="border rounded p-2" />
           <input required type="datetime-local" value={sessionDate} onChange={e => setSessionDate(e.target.value)} className="border rounded p-2 text-sm" />
-          <input required placeholder="رابط الحصة (Zoom/Jitsi)" value={sessionUrl} onChange={e => setSessionUrl(e.target.value)} className="border rounded p-2" dir="ltr" />
-          <button className="bg-green-600 text-white rounded p-2 font-semibold">+ جدولة حصة</button>
+          <input required placeholder={t.sessionUrlPlaceholder} value={sessionUrl} onChange={e => setSessionUrl(e.target.value)} className="border rounded p-2" dir="ltr" />
+          <button className="bg-green-600 text-white rounded p-2 font-semibold">{t.addSessionBtn}</button>
         </form>
         <ul className="divide-y mt-4">
           {sessions.map(s => (
@@ -232,7 +233,7 @@ export default function TeacherClassPage() {
                 <div className="text-xs text-gray-500 font-mono" dir="ltr">{new Date(s.starts_at).toLocaleString('fr-TN')}</div>
               </div>
               <div className="flex gap-2">
-                <a href={s.meeting_url} target="_blank" className="text-xs px-3 py-1 bg-green-100 text-green-700 font-semibold rounded">فتح الرابط</a>
+                <a href={s.meeting_url} target="_blank" className="text-xs px-3 py-1 bg-green-100 text-green-700 font-semibold rounded">{t.openLink}</a>
                 <button onClick={() => handleDelete('live_sessions', s.id)} className="text-red-500 hover:text-red-700 text-sm font-bold">🗑️</button>
               </div>
             </li>
@@ -242,7 +243,6 @@ export default function TeacherClassPage() {
 
       {/* المنتدى */}
       {userId && <Forum classId={id as string} userId={userId} />}
-      
     </div>
   )
 }

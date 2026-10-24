@@ -1,6 +1,7 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { translations, Lang } from '@/lib/i18n'
 
 export default function FileUpload({
   bucket, path, accept = '.pdf', onUploaded,
@@ -13,13 +14,19 @@ export default function FileUpload({
   const [uploading, setUploading] = useState(false)
   const [err, setErr] = useState('')
   const [selectedName, setSelectedName] = useState('')
+  const [lang, setLang] = useState<Lang>('ar')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const t = translations[lang]
+
+  useEffect(() => {
+    const savedLang = localStorage.getItem('lang') as Lang
+    if (savedLang && (savedLang === 'ar' || savedLang === 'fr')) setLang(savedLang)
+  }, [])
 
   function sanitizeFileName(name: string) {
     const lastDot = name.lastIndexOf('.')
     const ext = lastDot !== -1 ? name.slice(lastDot) : ''
     const base = lastDot !== -1 ? name.slice(0, lastDot) : name
-    // نبدلوا أي حاجة ماهيش حرف إنجليزي أو رقم بـ underscore
     const cleanBase = base.replace(/[^a-zA-Z0-9_-]/g, '_')
     return cleanBase + ext
   }
@@ -60,7 +67,7 @@ export default function FileUpload({
           disabled={uploading}
           className="px-4 py-2 bg-gray-100 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition disabled:opacity-50"
         >
-          {uploading ? '⏳ جاري الرفع...' : '📁 اختيار ملف'}
+          {uploading ? t.uploading : t.chooseFile}
         </button>
         {selectedName && !err && (
           <span className="text-xs text-gray-500 truncate max-w-[150px]" title={selectedName}>

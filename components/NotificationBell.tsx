@@ -32,7 +32,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
     return () => { supabase.removeChannel(ch) }
   }, [userId])
 
-  // نسكروا القائمة كي نكليكيو في بلاصة أخرى
+  // نسكروا القائمة كي ناضغطو في بلاصة أخرى
   useEffect(() => {
     function onClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
@@ -75,7 +75,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
               <button onClick={markAllRead} className="text-xs text-indigo-600 hover:underline">تعليم الكل كمقروء</button>
             )}
           </div>
-          {items.length === 0 && <div className="p-4 text-sm text-gray-500 text-center">ما فماش إشعارات</div>}
+          {items.length === 0 && <div className="p-4 text-sm text-gray-500 text-center"> إشعارات</div>}
           {items.map(n => (
             <button key={n.id} onClick={() => clickItem(n)}
               className={`w-full text-right p-3 border-b hover:bg-gray-50 transition ${n.read ? 'opacity-70' : 'bg-indigo-50/40'}`}>

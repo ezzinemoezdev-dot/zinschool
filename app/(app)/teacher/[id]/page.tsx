@@ -72,7 +72,7 @@ export default function TeacherClassPage() {
               <OpenFileButton bucket="materials" path={m.file_path} />
             </li>
           ))}
-          {!materials.length && <li className="text-gray-500 py-2">ما فماش دروس بعد.</li>}
+          {!materials.length && <li className="text-gray-500 py-2"> دروس بعد.</li>}
         </ul>
       </div>
     </div>
