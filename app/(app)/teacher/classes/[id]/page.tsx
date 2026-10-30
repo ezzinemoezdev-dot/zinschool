@@ -1,4 +1,5 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -52,13 +53,18 @@ export default function TeacherClassPage() {
     const { data: c } = await supabase.from('classes').select('*').eq('id', id).single()
     setCls(c)
     
-    const { data: m } = await supabase.from('materials').select('*').eq('class_id', id).order('created_at', { ascending: false })
+    // 🕵️‍♂️ DEBUG : On enlève le .order('created_at') et on ajoute des logs
+    const { data: m, error: mError } = await supabase.from('materials').select('*').eq('class_id', id)
+    console.log("🔍 DEBUG COURS - ID de la classe :", id)
+    console.log("🔍 DEBUG COURS - Données :", m)
+    console.log("🔍 DEBUG COURS - Erreur :", mError)
     setMaterials(m ?? [])
 
     const { data: s } = await supabase.from('live_sessions').select('*').eq('class_id', id).order('starts_at', { ascending: true })
     setSessions(s ?? [])
 
-    const { data: a } = await supabase.from('assignments').select('*, corrections(*)').eq('class_id', id).order('created_at', { ascending: false })
+    // 🕵️‍♂️ Si ça plante aussi pour les devoirs, enlève le .order('created_at') ici aussi
+    const { data: a } = await supabase.from('assignments').select('*, corrections(*)').eq('class_id', id)
     setAssignments(a ?? [])
 
     const { data: r } = await supabase.from('recordings').select('*').eq('class_id', id).order('created_at', { ascending: false })
@@ -73,15 +79,30 @@ export default function TeacherClassPage() {
     loadData()
   }, [id])
 
-  // ... (باقي الدوال كيف ما هي: addMaterial, addSession, addAssignment, addCorrection, addRecording, handleDelete)
-
   async function addMaterial(e: React.FormEvent) {
     e.preventDefault()
     if (!filePath) return alert('ارفع الملف أولاً')
     const { data: { user } } = await supabase.auth.getUser()
-    const { error } = await supabase.from('materials').insert({ class_id: id, teacher_id: user!.id, title, file_path: filePath, file_name: fileName })
-    if (error) alert(error.message)
-    else { setTitle(''); setFilePath(''); setFileName(''); loadData() }
+    
+    console.log("📤 DEBUG AJOUT - Titre :", title)
+    console.log("📤 DEBUG AJOUT - filePath :", filePath)
+
+    // 🕵️‍♂️ DEBUG : On ajoute .select() pour récupérer ce que Supabase a inséré, et on log l'erreur
+    const { data, error } = await supabase.from('materials').insert({ 
+      class_id: id, 
+      teacher_id: user!.id, 
+      title, 
+      file_path: filePath 
+    }).select()
+
+    console.log("📤 DEBUG AJOUT - Résultat Data :", data)
+    console.log("📤 DEBUG AJOUT - Résultat Erreur :", error)
+
+    if (error) {
+      alert("Erreur Supabase : " + error.message)
+    } else { 
+      setTitle(''); setFilePath(''); setFileName(''); loadData() 
+    }
   }
 
   async function addSession(e: React.FormEvent) {
@@ -116,8 +137,16 @@ export default function TeacherClassPage() {
     else { setRecTitle(''); setRecUrl(''); loadData() }
   }
 
-  async function handleDelete(table: string, rowId: string) {
+  async function handleDelete(table: string, rowId: string, filePath?: string, bucketName?: string) {
     if (!confirm('هل أنت متأكد من حذف هذا العنصر؟')) return
+
+    if (filePath && bucketName) {
+      const { error: storageError } = await supabase.storage.from(bucketName).remove([filePath])
+      if (storageError) {
+        console.error("Erreur suppression fichier:", storageError)
+      }
+    }
+
     const { error } = await supabase.from(table).delete().eq('id', rowId)
     if (error) alert(error.message)
     else loadData()
@@ -155,7 +184,7 @@ export default function TeacherClassPage() {
               <div><div className="font-medium">{m.title}</div></div>
               <div className="flex gap-2">
                 <OpenFileButton bucket="materials" path={m.file_path} />
-                <button onClick={() => handleDelete('materials', m.id)} className="text-red-500 hover:text-red-700 text-sm font-bold">🗑️</button>
+                <button onClick={() => handleDelete('materials', m.id, m.file_path, 'materials')} className="text-red-500 hover:text-red-700 text-sm font-bold">🗑️</button>
               </div>
             </li>
           ))}
@@ -173,7 +202,8 @@ export default function TeacherClassPage() {
         <ul className="space-y-4 mt-4">
           {assignments.map(a => (
             <li key={a.id} className="p-4 border rounded-lg bg-gray-50 relative">
-              <button onClick={() => handleDelete('assignments', a.id)} className="absolute top-2 left-2 text-red-500 hover:text-red-700 font-bold">🗑️</button>
+              <button onClick={() => handleDelete('assignments', a.id, a.file_path, 'assignments')} className="absolute top-2 left-2 text-red-500 hover:text-red-700 font-bold">🗑️</button>
+              
               <div className="flex justify-between items-center mb-3 pr-8">
                 <div className="font-bold text-lg text-gray-800">{a.title}</div>
                 <OpenFileButton bucket="assignments" path={a.file_path} label="تحميل الموضوع" />
@@ -184,7 +214,7 @@ export default function TeacherClassPage() {
                   a.corrections.map((c: any) => (
                     <div key={c.id} className="flex gap-2 items-center mb-2">
                       <OpenFileButton bucket="corrections" path={c.file_path} label="فتح الإصلاح" />
-                      <button onClick={() => handleDelete('corrections', c.id)} className="text-red-500 text-xs font-bold">🗑️</button>
+                      <button onClick={() => handleDelete('corrections', c.id, c.file_path, 'corrections')} className="text-red-500 text-xs font-bold">🗑️</button>
                     </div>
                   ))
                 ) : <div className="text-xs text-gray-500 mb-2">لم يتم رفع الإصلاح بعد.</div>}
