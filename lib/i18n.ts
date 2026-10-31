@@ -1,22 +1,17 @@
 export const translations = {
   ar: {
-        // ... الكلمات القديمة
+    appName: "ZinSchool",
+    
+    // Authentification
     loginTitle: "تسجيل الدخول",
     emailPlaceholder: "البريد الإلكتروني (Email)",
     passwordPlaceholder: "كلمة السر (Mot de passe)",
     forgotPasswordLink: "نسيت كلمة السر؟",
     noAccountLink: "ليس لديك حساب؟",
     registerLink: "سجل الآن",
-    appName: "ZinSchool",
     login: "دخول",
     register: "تسجيل جديد",
     logout: "خروج",
-    teacherDashboard: "لوحة الأستاذ",
-    studentDashboard: "لوحة التلميذ",
-    myClasses: "أقسامي",
-    joinClass: "انضم لقسم",
-    teacher: "أستاذ",
-    student: "تلميذ",
     email: "البريد الإلكتروني",
     password: "كلمة السر",
     loginBtn: "دخول",
@@ -25,25 +20,20 @@ export const translations = {
     hasAccount: "عندك حساب؟",
     registerHere: "سجّل",
     loginHere: "دخول",
-        // ... الكلمات القديمة
-    backToStudentDashboard: "← رجوع للوحة التلميذ",
-    coursesAndFiles: "📄 الدروس والملفات",
-    openPdf: "فتح PDF",
-    assignmentsAndCorrections: "📝 الأعمال والإصلاحات",
-    openSubject: "فتح الموضوع",
-    correctionAvailable: "✅ الإصلاح متاح:",
-    downloadCorrection: "تحميل الإصلاح",
-    noCorrectionYet: "الإصلاح لم يتم رفعه بعد.",
-    noAssignmentsYet: "لا توجد أعمال بعد.",
-    recordingsTitle: "🎬 التسجيلات",
-    watchBtn: "مشاهدة",
-    noRecordingsYet: "لا توجد تسجيلات بعد.",
-    liveSessionsTitle: "🎥 الحصص المباشرة",
-    joinSessionBtn: "دخول",
-    noLiveSessionsYet: "لا توجد حصص مباشرة مجدولة.",
 
+    // Dashboard
+    teacherDashboard: "لوحة الأستاذ",
+    studentDashboard: "لوحة التلميذ",
+    teacher: "أستاذ",
+    student: "تلميذ",
+    studentDashboardTitle: "لوحة التلميذ",
+    joinNewClassBtn: "+ انضم لقسم جديد بكود الدعوة",
+    myClassesSection: "أقسامي",
+    noEnrolledClasses: "أنت غير مسجل في أي قسم حالياً.",
 
-    // إدارة الأقسام
+    // إدارة الأقسام (Classes)
+    myClasses: "أقسامي",
+    joinClass: "انضم لقسم",
     manageClassesTitle: "أقسامي",
     classNamePlaceholder: "اسم القسم (مثال: رياضيات باك)",
     subjectPlaceholder: "المادة",
@@ -51,13 +41,12 @@ export const translations = {
     createClassBtn: "+ إنشاء قسم",
     inviteCode: "كود الدعوة:",
     noClasses: "ليس لديك أقسام بعد. أضف قسماً من الفورم فوق.",
-        // ... الكلمات القديمة
     joinClassTitle: "انضم لقسم",
     joinClassSubtitle: "حط كود الدعوة اللي عطاك الأستاذ.",
     joinClassPlaceholder: "مثال: ABC123",
     joinClassBtn: "انضم",
     joinClassError: "كود غير صحيح، عاود جرب.",
-    
+
     // صفحة القسم الداخلية
     backToClasses: "← رجوع للأقسام",
     studentsListBtn: "👥 عرض التلامذة",
@@ -76,19 +65,32 @@ export const translations = {
     sessionUrlPlaceholder: "رابط الحصة (Zoom/Jitsi)",
     addSessionBtn: "+ جدولة حصة",
     view: "مشاهدة",
-        // ... الكلمات القديمة
+
+    // صفحة التلميذ داخل القسم
+    backToStudentDashboard: "← رجوع للوحة التلميذ",
+    coursesAndFiles: "📄 الدروس والملفات",
+    openPdf: "فتح PDF",
+    assignmentsAndCorrections: "📝 الأعمال والإصلاحات",
+    openSubject: "فتح الموضوع",
+    correctionAvailable: "✅ الإصلاح متاح:",
+    downloadCorrection: "تحميل الإصلاح",
+    noCorrectionYet: "الإصلاح لم يتم رفعه بعد.",
+    noAssignmentsYet: "لا توجد أعمال بعد.",
+    recordingsTitle: "🎬 التسجيلات",
+    watchBtn: "مشاهدة",
+    noRecordingsYet: "لا توجد تسجيلات بعد.",
+    liveSessionsTitle: "🎥 الحصص المباشرة",
+    joinSessionBtn: "دخول",
+    noLiveSessionsYet: "لا توجد حصص مباشرة مجدولة.",
+
+    // قائمة التلامذة
     studentsTitle: "قائمة التلامذة",
     studentsSubtitle: "التلامذة المسجلين في هذا القسم",
     backToClass: "← رجوع للقسم",
     removeFromClass: "إزالة من القسم",
     noStudents: "لا يوجد تلامذة مسجلين بعد.",
-        // ... الكلمات القديمة
-    studentDashboardTitle: "لوحة التلميذ",
-    joinNewClassBtn: "+ انضم لقسم جديد بكود الدعوة",
-    myClassesSection: "أقسامي",
-    noEnrolledClasses: "أنت غير مسجل في أي قسم حالياً.",
 
-    // المنتدى
+    // المنتدى (Forum)
     forumTitle: "💬 منتدى النقاش",
     forumPlaceholder: "اكتب سؤالك أو تعليقك هنا...",
     sendBtn: "إرسال",
@@ -98,24 +100,20 @@ export const translations = {
     uploading: "⏳ جاري الرفع...",
     deletePostConfirm: "هل أنت متأكد من حذف هذه الرسالة؟",
   },
+  
   fr: {
-        // ... الكلمات القديمة
+    appName: "ZinSchool",
+
+    // Authentification
     loginTitle: "Connexion",
     emailPlaceholder: "Email",
     passwordPlaceholder: "Mot de passe",
     forgotPasswordLink: "Mot de passe oublié ?",
     noAccountLink: "Pas de compte ?",
     registerLink: "S'inscrire",
-    appName: "ZinSchool",
     login: "Connexion",
     register: "S'inscrire",
     logout: "Déconnexion",
-    teacherDashboard: "Espace Professeur",
-    studentDashboard: "Espace Élève",
-    myClasses: "Mes Classes",
-    joinClass: "Rejoindre une classe",
-    teacher: "Professeur",
-    student: "Élève",
     email: "Email",
     password: "Mot de passe",
     loginBtn: "Se connecter",
@@ -124,24 +122,20 @@ export const translations = {
     hasAccount: "Déjà un compte ?",
     registerHere: "S'inscrire",
     loginHere: "Se connecter",
-        // ... الكلمات القديمة
-    backToStudentDashboard: "← Retour au tableau de bord",
-    coursesAndFiles: "📄 Cours et Fichiers",
-    openPdf: "Ouvrir PDF",
-    assignmentsAndCorrections: "📝 Devoirs et Corrections",
-    openSubject: "Ouvrir le sujet",
-    correctionAvailable: "✅ Correction disponible :",
-    downloadCorrection: "Télécharger la correction",
-    noCorrectionYet: "La correction n'est pas encore disponible.",
-    noAssignmentsYet: "Aucun devoir pour le moment.",
-    recordingsTitle: "🎬 Enregistrements",
-    watchBtn: "Voir",
-    noRecordingsYet: "Aucun enregistrement pour le moment.",
-    liveSessionsTitle: "🎥 Sessions en direct",
-    joinSessionBtn: "Rejoindre",
-    noLiveSessionsYet: "Aucune session en direct planifiée.",
 
-    // إدارة الأقسام
+    // Dashboard
+    teacherDashboard: "Espace Professeur",
+    studentDashboard: "Espace Élève",
+    teacher: "Professeur",
+    student: "Élève",
+    studentDashboardTitle: "Espace Élève",
+    joinNewClassBtn: "+ Rejoindre une nouvelle classe",
+    myClassesSection: "Mes Classes",
+    noEnrolledClasses: "Vous n'êtes inscrit dans aucune classe.",
+
+    // Gestion des classes
+    myClasses: "Mes Classes",
+    joinClass: "Rejoindre une classe",
     manageClassesTitle: "Mes Classes",
     classNamePlaceholder: "Nom de la classe (ex: Maths Bac)",
     subjectPlaceholder: "Matière",
@@ -149,19 +143,13 @@ export const translations = {
     createClassBtn: "+ Créer une classe",
     inviteCode: "Code d'invitation :",
     noClasses: "Vous n'avez pas encore de classes. Ajoutez-en une ci-dessus.",
-        // ... الكلمات القديمة
-    studentDashboardTitle: "Espace Élève",
-    joinNewClassBtn: "+ Rejoindre une nouvelle classe",
-    myClassesSection: "Mes Classes",
-    noEnrolledClasses: "Vous n'êtes inscrit dans aucune classe.",
-        // ... الكلمات القديمة
     joinClassTitle: "Rejoindre une classe",
     joinClassSubtitle: "Entrez le code d'invitation fourni par votre professeur.",
     joinClassPlaceholder: "EX: ABC123",
     joinClassBtn: "Rejoindre",
     joinClassError: "Code invalide. Veuillez réessayer.",
-    
-    // صفحة القسم الداخلية
+
+    // Page intérieure de la classe
     backToClasses: "← Retour aux classes",
     studentsListBtn: "👥 Voir les élèves",
     addMaterialTitle: "📄 Ajouter un cours (PDF)",
@@ -179,21 +167,40 @@ export const translations = {
     sessionUrlPlaceholder: "Lien de la session (Zoom/Jitsi)",
     addSessionBtn: "+ Planifier une session",
     view: "Voir",
-    chooseFile: "📁 Choisir un fichier",
-    openLink: "Ouvrir le lien",
-    uploading: "⏳ Téléchargement...",
-    deletePostConfirm: "Êtes-vous sûr de vouloir supprimer ce message ?",
-        // ... الكلمات القديمة
+
+    // Page élève dans la classe
+    backToStudentDashboard: "← Retour au tableau de bord",
+    coursesAndFiles: "📄 Cours et Fichiers",
+    openPdf: "Ouvrir PDF",
+    assignmentsAndCorrections: "📝 Devoirs et Corrections",
+    openSubject: "Ouvrir le sujet",
+    correctionAvailable: "✅ Correction disponible :",
+    downloadCorrection: "Télécharger la correction",
+    noCorrectionYet: "La correction n'est pas encore disponible.",
+    noAssignmentsYet: "Aucun devoir pour le moment.",
+    recordingsTitle: "🎬 Enregistrements",
+    watchBtn: "Voir",
+    noRecordingsYet: "Aucun enregistrement pour le moment.",
+    liveSessionsTitle: "🎥 Sessions en direct",
+    joinSessionBtn: "Rejoindre",
+    noLiveSessionsYet: "Aucune session en direct planifiée.",
+
+    // Liste des élèves
     studentsTitle: "Liste des élèves",
     studentsSubtitle: "Élèves inscrits dans cette classe",
     backToClass: "← Retour à la classe",
     removeFromClass: "Retirer de la classe",
     noStudents: "Aucun élève inscrit pour le moment.",
-    // المنتدى
+
+    // Forum
     forumTitle: "💬 Forum de discussion",
     forumPlaceholder: "Écrivez votre question ou commentaire ici...",
     sendBtn: "Envoyer",
     forumEmpty: "Pas encore de messages. Soyez le premier à écrire !",
+    chooseFile: "📁 Choisir un fichier",
+    openLink: "Ouvrir le lien",
+    uploading: "⏳ Téléchargement...",
+    deletePostConfirm: "Êtes-vous sûr de vouloir supprimer ce message ?",
   }
 }
 
