@@ -53,17 +53,12 @@ export default function TeacherClassPage() {
     const { data: c } = await supabase.from('classes').select('*').eq('id', id).single()
     setCls(c)
     
-    // 🕵️‍♂️ DEBUG : On enlève le .order('created_at') et on ajoute des logs
-    const { data: m, error: mError } = await supabase.from('materials').select('*').eq('class_id', id)
-    console.log("🔍 DEBUG COURS - ID de la classe :", id)
-    console.log("🔍 DEBUG COURS - Données :", m)
-    console.log("🔍 DEBUG COURS - Erreur :", mError)
+    const { data: m } = await supabase.from('materials').select('*').eq('class_id', id)
     setMaterials(m ?? [])
 
     const { data: s } = await supabase.from('live_sessions').select('*').eq('class_id', id).order('starts_at', { ascending: true })
     setSessions(s ?? [])
 
-    // 🕵️‍♂️ Si ça plante aussi pour les devoirs, enlève le .order('created_at') ici aussi
     const { data: a } = await supabase.from('assignments').select('*, corrections(*)').eq('class_id', id)
     setAssignments(a ?? [])
 
@@ -84,10 +79,6 @@ export default function TeacherClassPage() {
     if (!filePath) return alert('ارفع الملف أولاً')
     const { data: { user } } = await supabase.auth.getUser()
     
-    console.log("📤 DEBUG AJOUT - Titre :", title)
-    console.log("📤 DEBUG AJOUT - filePath :", filePath)
-
-    // 🕵️‍♂️ DEBUG : On ajoute .select() pour récupérer ce que Supabase a inséré, et on log l'erreur
     const { data, error } = await supabase.from('materials').insert({ 
       class_id: id, 
       teacher_id: user!.id, 
@@ -95,13 +86,22 @@ export default function TeacherClassPage() {
       file_path: filePath 
     }).select()
 
-    console.log("📤 DEBUG AJOUT - Résultat Data :", data)
-    console.log("📤 DEBUG AJOUT - Résultat Erreur :", error)
-
     if (error) {
       alert("Erreur Supabase : " + error.message)
     } else { 
+      // 1. On met à jour la liste des cours sur la page
       setTitle(''); setFilePath(''); setFileName(''); loadData() 
+
+      // 2. 🌟 ON ENVOIE LA NOTIFICATION AUX ÉLÈVES 🌟
+      await fetch('/api/push/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: "Nouveau cours disponible ! 📚",
+          message: `Un nouveau cours vient d'être ajouté : ${title}`,
+          url: `/student/classes/${id}` 
+        })
+      })
     }
   }
 

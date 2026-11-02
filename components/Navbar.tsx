@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import NotificationBell from './NotificationBell'
+import NotificationToggle from './NotificationToggle' // 👈 Nouvel import ajouté ici
 import { translations, Lang } from '@/lib/i18n'
 import { useState, useEffect } from 'react'
 
@@ -64,6 +65,9 @@ export default function Navbar({ profile }: { profile: any }) {
           </button>
           
           <NotificationBell userId={profile?.id} />
+          
+          {/* 👇 On ajoute le bouton d'activation des notifications ici 👇 */}
+          <NotificationToggle />
           
           <div className="flex flex-col items-start md:items-end">
             <span className="text-sm text-gray-800 font-bold">{profile?.full_name}</span>
